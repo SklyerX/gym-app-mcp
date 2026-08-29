@@ -62,7 +62,7 @@ export class AuthClient {
 
   async generateDiscordAuthLink(returnTo?: string) {
     const state = await this.createState(returnTo);
-    const scope = ["identify", "email", "guilds"];
+    const scope = ["identify", "email"];
     return `https://discord.com/oauth2/authorize?response_type=code&client_id=${env.DISCORD_CLIENT_ID}&scope=${scope.join("%20")}&state=${state}&redirect_uri=${env.DISCORD_REDIRECT_URI}&prompt=consent&integration_type=0`;
   }
 
