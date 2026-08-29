@@ -3,7 +3,7 @@ import authRoutes from "./routes/auth.js";
 import oauthRoutes from "./routes/oauth.js";
 import wellKnownRoutes from "./routes/well-known.js";
 import { mcpGate } from "./middleware/mcp-gate.js";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPTransport } from "@hono/mcp";
 import { ToolManager } from "./services/tool-manager.js";
 import type { User } from "./utils/types.js";

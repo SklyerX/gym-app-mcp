@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types";
+import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import type { users } from "../db/schema.js";
 
 export type User = typeof users.$inferSelect;

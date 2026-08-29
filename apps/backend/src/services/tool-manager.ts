@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { tools } from "../tools/index.js";
 import type { User } from "../utils/types.js";
 
