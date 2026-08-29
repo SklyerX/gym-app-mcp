@@ -1,7 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import { createHash, timingSafeEqual } from "node:crypto";
-import { db } from "../db";
-import { env } from "../utils/env";
+import { db } from "../db/index.js";
+import { env } from "../utils/env.js";
 
 export const mcpGate = createMiddleware(async (c, next) => {
   const token = c.req.header("Authorization")?.split("Bearer ").at(1);
