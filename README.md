@@ -74,7 +74,34 @@ An 11pm snack counts towards that night. A 12:05am snack counts towards the new 
 
 New accounts default to UTC, which is a placeholder rather than a real answer — nutrition tools return a `timezone_warning` until it is set, so the model knows to ask.
 
-## How connecting a client works
+## Connecting a client
+
+The server speaks streamable HTTP and advertises its own OAuth metadata, so any MCP client that supports remote servers can discover the rest on its own. All you ever hand it is the `/mcp` URL.
+
+**Claude (web or desktop)** — *Settings → Connectors → Add custom connector*:
+
+| Field | Value |
+|---|---|
+| Name | Anything. `Gym App` |
+| URL | `https://gym-api.skylerx.ir/mcp` — your `HOSTED_API_URL` with `/mcp` on the end |
+
+Hit **Continue**. Claude calls the server, gets a `401` pointing at the authorization metadata, registers itself, and opens a browser tab. Sign in with Discord, approve the connection on the consent screen, and the tools show up in the connector list.
+
+**Claude Code**
+
+```bash
+claude mcp add --transport http gym https://gym-api.skylerx.ir/mcp
+```
+
+Same flow — the first call triggers the browser sign-in.
+
+Notes:
+
+- The path matters. `https://host` alone will not work; it has to be `https://host/mcp`.
+- Hosted servers need real HTTPS. For local development `http://localhost:8888/mcp` is fine.
+- Nothing is granted until you click approve, and the consent screen shows which client asked and where its codes will be sent.
+
+## What happens under the hood
 
 Two identities, never confused. A **session cookie** is the human, browser only. A **bearer token** is the client, API only — and it only exists after that human clicked approve.
 
@@ -182,9 +209,9 @@ Adding a tool: write the file, export a `defineTool({...})`, add one line to `to
 The API and the site can live on separate hosts, but the session cookie has to reach both. Put them on subdomains of one domain you own and set `COOKIE_DOMAIN` to the shared parent:
 
 ```
-api.example.com    →  HOSTED_API_URL
-app.example.com    →  FRONTEND_URL
-COOKIE_DOMAIN=.example.com
+gym-api.skylerx.ir   →  HOSTED_API_URL
+gym.skylerx.ir       →  FRONTEND_URL
+COOKIE_DOMAIN=.skylerx.ir
 ```
 
 Two unrelated hostnames still complete the OAuth flow — every step that needs the cookie happens on the API host — but the site can never show a signed-in state, so its "already signed in, skip the login page" check goes dead.
