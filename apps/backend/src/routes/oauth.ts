@@ -32,7 +32,7 @@ oauthRoutes.post(
     const {
       client_name,
       redirect_uris,
-      grant_types = ["authorization_code"],
+      grant_types = ["authorization_code", "refresh_token"], // technically not best practice to include refresh token by default but for some reason MCP providers fail to refresh it if its not there
       response_types = ["code"],
       token_endpoint_auth_method,
     } = c.req.valid("json");
