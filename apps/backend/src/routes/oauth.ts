@@ -325,7 +325,7 @@ oauthRoutes.post(
       const lu = rawToken.slice(0, 8);
 
       const hashedIncoming = createHash("sha256")
-        .update(refresh_token)
+        .update(rawToken)
         .digest();
 
       const existingToken = await db.query.oauthTokens.findFirst({
@@ -366,11 +366,13 @@ oauthRoutes.post(
 
           accessToken: accessToken.completeHash,
           refreshToken: refreshToken.completeHash,
-
+          accessTokenExpiresAt: new Date(
+            Date.now() + ACCESS_TOKEN_TTL_SEC * 1000,
+          ),
           refreshTokenExpiresAt: REFRESH_TOKEN_EXPIRY,
         })
         .where(
-          and(eq(oauthTokens.luKey, lu), eq(oauthTokens.clientId, client_id)),
+          and(eq(oauthTokens.refreshLuKey, lu), eq(oauthTokens.clientId, client_id)),
         );
 
       return c.json({
