@@ -6,7 +6,9 @@ import createRoutineSession from "./create-routine-session.js";
 import deleteFoodEntry from "./delete-food-entry.js";
 import deleteRoutine from "./delete-routine.js";
 import deleteRoutineSession from "./delete-routine-session.js";
+import deleteSetEntry from "./delete-set-entry.js";
 import endWorkoutSession from "./end-workout-session.js";
+import editSetEntry from "./edit-set-entry.js";
 import getExerciseHistory from "./get-exercise-history.js";
 import getExercises from "./get-exercises.js";
 import getFoodEntries from "./get-food-entries.js";
@@ -37,6 +39,8 @@ export const tools: AnyToolModule[] = [
   startWorkoutSession,
   endWorkoutSession,
   appendSetEntry,
+  editSetEntry,
+  deleteSetEntry,
 
   // Reads over logged history.
   getWorkoutSessions,
