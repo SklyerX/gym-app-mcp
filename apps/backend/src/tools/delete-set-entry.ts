@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "../db/index.js";
 import { setEntries } from "../db/schema.js";
@@ -24,31 +24,20 @@ export default defineTool({
       .where(
         and(
           eq(setEntries.id, set_entry_id),
-          eq(
-            setEntries.workoutSessionId,
-            db
-              .select({ id: setEntries.workoutSessionId })
-              .from(setEntries)
-              .where(eq(setEntries.id, set_entry_id)),
-          ),
+          sql`exists (
+            select 1
+            from workout_sessions
+            where workout_sessions.id = ${setEntries.workoutSessionId}
+              and workout_sessions.user_id = ${user.id}
+          )`,
         ),
       )
       .returning();
 
     if (!deleted) {
       return fail(
-        `No set '${set_entry_id}' was found. Nothing was deleted — use the id returned by append_set_entry or get_workout_sessions.`,
+        `No set '${set_entry_id}' belongs to this user. Nothing was deleted — use the id returned by append_set_entry or get_workout_sessions.`,
       );
-    }
-
-    const session = await db.query.workoutSessions.findFirst({
-      where: { id: deleted.workoutSessionId, userId: user.id },
-      columns: { id: true },
-    });
-
-    if (!session) {
-      // The ownership-scoped lookup below is the actual delete guard.
-      return fail("Set does not belong to this user.");
     }
 
     return ok({
