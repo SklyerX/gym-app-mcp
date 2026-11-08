@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "../db/index.js";
 import { methodEnum, setEntries, unitEnum } from "../db/schema.js";
@@ -8,7 +8,7 @@ import { defineTool } from "../utils/types.js";
 export default defineTool({
   name: "edit_set_entry",
   description:
-    "Correct an already-logged workout set. Use the set id returned by append_set_entry or get_workout_sessions. Only supply fields that need changing; omitted fields stay unchanged. Can correct reps, weight, unit, method, and set metadata such as RPE. The set must belong to the authenticated user.",
+    "Correct an already-logged workout set. Use the set id returned by append_set_entry or get_workout_sessions. Only supply fields that need changing; omitted fields stay unchanged. Can correct reps, weight, unit, and set method. The set must belong to the authenticated user.",
   annotations: { readOnlyHint: false, openWorldHint: false },
   input: {
     set_entry_id: z.string().describe("Id of the specific set to correct."),
@@ -16,15 +16,13 @@ export default defineTool({
     weight: z.number().min(0).optional().describe("Corrected load."),
     unit: z.enum(unitEnum.enumValues).optional().describe("Unit for the corrected load: kg or lbs."),
     method: z.enum(methodEnum.enumValues).optional().describe("Corrected set method."),
-    meta: z.record(z.string(), z.string().or(z.number()).or(z.boolean())).optional().describe("Metadata keys to merge into the existing metadata, such as rpe, tempo, or toFailure."),
   },
-  load: async (user, { set_entry_id, reps, weight, unit, method, meta }) => {
+  load: async (user, { set_entry_id, reps, weight, unit, method }) => {
     if (
       reps === undefined &&
       weight === undefined &&
       unit === undefined &&
-      method === undefined &&
-      meta === undefined
+      method === undefined
     ) {
       return fail("No changes supplied. Provide at least one field to update.");
     }
@@ -47,9 +45,6 @@ export default defineTool({
         ...(weight !== undefined ? { weight: weight.toString() } : {}),
         ...(unit !== undefined ? { unit } : {}),
         ...(method !== undefined ? { method } : {}),
-        ...(meta !== undefined
-          ? { meta: { ...(existing.meta ?? {}), ...meta } }
-          : {}),
       })
       .where(eq(setEntries.id, set_entry_id))
       .returning();
